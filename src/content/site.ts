@@ -8,12 +8,14 @@
 
 export const site = {
   name: "OMNIA",
-  legalName: "OMNIA (razón social pendiente)",
-  rif: "J-00000000-0",
+  legalName: "OMNIA Tecnología e Infraestructura, C.A.",
+  rif: "J-50886695-9",
   domain: "omnia.ia.ve",
   email: "contacto@omnia.ia.ve",
   phone: "+58 000 000 0000",
-  city: "Caracas, Venezuela",
+  city: "Maracaibo, Zulia, Venezuela",
+  address:
+    "Calle 67 con Avenida 3F, C.C. Camoruco, nivel PB, local 1-03, sector Bellas Artes, Maracaibo, estado Zulia, zona postal 4002",
   tagline: "Innovación tecnológica de punta a punta",
 };
 

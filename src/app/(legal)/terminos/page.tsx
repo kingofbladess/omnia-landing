@@ -10,7 +10,7 @@ export default function Terminos() {
     <>
       <LegalHeader
         title="Términos y Condiciones"
-        intro={`Estos Términos regulan el uso del sitio web ${site.domain} (el "Sitio"), operado por ${site.legalName}, RIF ${site.rif}, con domicilio en ${site.city} ("OMNIA", "nosotros"). Al navegar o crear una cuenta en el Sitio aceptas estos Términos. Si no estás de acuerdo, no utilices el Sitio.`}
+        intro={`Estos Términos regulan el uso del sitio web ${site.domain} (el "Sitio"), operado por ${site.legalName}, RIF ${site.rif}, con domicilio en ${site.address} ("OMNIA", "nosotros"). Al navegar o crear una cuenta en el Sitio aceptas estos Términos. Si no estás de acuerdo, no utilices el Sitio.`}
       />
 
       <h2>1. Objeto del Sitio</h2>
@@ -78,7 +78,7 @@ export default function Terminos() {
       <h2>10. Ley aplicable y jurisdicción</h2>
       <p>
         Estos Términos se rigen por las leyes de la República Bolivariana de Venezuela, incluida la Ley sobre Mensajes de
-        Datos y Firmas Electrónicas. Cualquier controversia se someterá a los tribunales competentes de {site.city}.
+        Datos y Firmas Electrónicas. Cualquier controversia se someterá a los tribunales competentes de la ciudad de Maracaibo, estado Zulia.
       </p>
 
       <h2>11. Contacto</h2>

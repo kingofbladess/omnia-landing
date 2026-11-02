@@ -15,7 +15,7 @@ export default function Privacidad() {
 
       <h2>1. Responsable del tratamiento</h2>
       <p>
-        {site.legalName}, RIF {site.rif}, {site.city}. Contacto: <a href={`mailto:${site.email}`}>{site.email}</a>.
+        {site.legalName}, RIF {site.rif}, {site.address}. Contacto: <a href={`mailto:${site.email}`}>{site.email}</a>.
       </p>
 
       <h2>2. Datos que recopilamos</h2>
