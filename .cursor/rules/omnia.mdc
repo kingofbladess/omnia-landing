@@ -1,0 +1,15 @@
+---
+description: Contexto del proyecto OMNIA para el asistente de Cursor
+alwaysApply: true
+---
+
+# OMNIA · Landing
+
+- Sitio de OMNIA Tecnología e Infraestructura, C.A. (RIF J-50886695-9, Maracaibo, Zulia). Dominio previsto: omnia.ia.ve.
+- Stack: Next.js 15 (App Router, `src/`), React 19, Tailwind CSS 4, Supabase (`@supabase/ssr`), despliegue en Vercel.
+- Idioma de la interfaz y del código visible: español.
+- Textos editables en `src/content/site.ts`; colores/tokens en `src/app/globals.css` (`--accent`, `--bg`, etc.). No uses colores sueltos: usa los tokens (`bg-accent`, `text-muted`, `border-line`...).
+- Estilo: corporativo premium, oscuro, nada genérico. Botones con `MagneticButton`, tarjetas con `SpotCard`, animaciones de entrada con `Reveal` (`src/components/interactive.tsx`). Respeta `prefers-reduced-motion`.
+- Roles: `profiles.role` = `user` | `admin`. Permisos con RLS en `supabase/schema.sql`; toda acción de admin pasa por `requireAdmin()` en `src/app/actions.ts`.
+- Rutas privadas `/cuenta` y `/admin` protegidas en `src/middleware.ts`.
+- Antes de dar algo por terminado: `npm run lint` y `npm run build` sin errores.
