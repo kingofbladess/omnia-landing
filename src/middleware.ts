@@ -45,6 +45,9 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
+// Solo donde hace falta la sesión en el servidor. La página principal y las legales
+// se sirven estáticas desde la CDN, sin pasar por aquí (cargan más rápido);
+// allí la sesión la lee el navegador.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"],
+  matcher: ["/cuenta/:path*", "/admin/:path*", "/acceso", "/auth/:path*"],
 };

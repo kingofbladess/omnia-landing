@@ -1,12 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Manrope, Sora, IBM_Plex_Mono, Michroma } from "next/font/google";
 import "./globals.css";
 import { CookieBanner } from "@/components/CookieBanner";
 import { site } from "@/content/site";
 
-const body = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap" });
-const display = Space_Grotesk({ subsets: ["latin"], variable: "--font-display", display: "swap" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
+// Tipografía del sitio: Manrope (texto), Sora (títulos) e IBM Plex Mono (datos y etiquetas).
+const body = Manrope({ subsets: ["latin"], variable: "--font-body", display: "swap" });
+const display = Sora({ subsets: ["latin"], variable: "--font-display", display: "swap" });
+const mono = IBM_Plex_Mono({ weight: ["400", "500"], subsets: ["latin"], variable: "--font-mono", display: "swap" });
+// Solo para el nombre OMNIA en 3D (portada y pie).
+const brand = Michroma({ weight: "400", subsets: ["latin"], variable: "--font-brand", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(`https://${site.domain}`),
@@ -32,7 +35,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={`${body.variable} ${display.variable} ${mono.variable}`}>
+    <html lang="es" className={`${body.variable} ${display.variable} ${mono.variable} ${brand.variable}`}>
       <body>
         {children}
         <CookieBanner />

@@ -1,5 +1,6 @@
 import { ContactForm } from "@/components/ContactForm";
 import { Footer } from "@/components/Footer";
+import { FooterMark } from "@/components/FooterInteractive";
 import { Header } from "@/components/Header";
 import { AreaDivider, AreaSystem } from "@/components/AreaSystem";
 import { Counter, MagneticButton, Reveal, SpotCard } from "@/components/interactive";
@@ -53,63 +54,62 @@ export default function Home() {
             style={{ background: "radial-gradient(closest-side, rgba(61,123,255,0.45), rgba(0,209,255,0.12), transparent)" }}
           />
 
-          <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-            <Reveal>
-              <span className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-muted backdrop-blur sm:text-[11px] sm:tracking-[0.16em]">
-                <span className="led h-1.5 w-1.5 shrink-0 rounded-full bg-accent-2" />
-                {hero.eyebrow}
-              </span>
-            </Reveal>
-            <Reveal delay={100}>
-              <h1 className="mt-6 font-display text-[2.6rem] font-semibold leading-[1.02] tracking-[-0.03em] text-balance sm:text-6xl lg:text-[clamp(3.5rem,5.6vw,4.9rem)]">
-                <span className="block text-fg lg:whitespace-nowrap">{hero.title[0]}</span>
-                <span className="text-gradient block pb-[0.08em] lg:whitespace-nowrap">{hero.title[1]}</span>
-              </h1>
-            </Reveal>
+          <div className="mx-auto w-full max-w-7xl px-4 pb-16 pt-4 sm:px-6 sm:pt-6 lg:px-8">
+            {/* El nombre en 3D como pieza principal de la portada */}
+            <FooterMark text={site.name} intro="build" className="text-[clamp(2.4rem,11vw,7.5rem)]" />
 
-            <div className="mt-8 grid items-start gap-12 lg:grid-cols-[1fr_auto]">
-              <div>
-                <Reveal delay={200}>
-                  <p className="max-w-xl text-base leading-relaxed text-muted sm:text-lg">{hero.subtitle}</p>
-                </Reveal>
-                <Reveal delay={300}>
-                  <div className="mt-9 flex flex-wrap gap-3">
-                    <MagneticButton href={hero.primary.href}>{hero.primary.label}</MagneticButton>
-                    <MagneticButton href={hero.secondary.href} variant="ghost">
-                      {hero.secondary.label}
-                    </MagneticButton>
-                  </div>
-                </Reveal>
-                <Reveal delay={350}>
-                  <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-                    {hero.proof.map((p) => (
-                      <li key={p} className="flex items-center gap-2">
-                        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-accent-2" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-                          <path d="M3 8.5l3 3 7-7" />
-                        </svg>
-                        {p}
-                      </li>
-                    ))}
-                  </ul>
-                </Reveal>
-              </div>
-              <Reveal delay={400} className="hidden lg:-mt-14 lg:block xl:-mt-20">
-                <LiveStatus />
+            {/* Todo centrado bajo el nombre */}
+            <div className="mx-auto mt-2 flex max-w-4xl flex-col items-center text-center">
+              <Reveal>
+                <span className="inline-flex items-center justify-center gap-2 rounded-full border border-line-strong bg-white/[0.03] py-1.5 pl-3 pr-[calc(0.75rem-0.04em)] text-center font-mono text-[9px] uppercase tracking-[0.04em] text-muted backdrop-blur sm:pr-[calc(0.75rem-0.16em)] sm:text-[11px] sm:tracking-[0.16em]">
+                  <span className="led h-1.5 w-1.5 shrink-0 rounded-full bg-accent-2" />
+                  {hero.eyebrow}
+                </span>
               </Reveal>
+              <Reveal delay={100}>
+                <h1 className="mt-6 font-display text-[clamp(1.85rem,8.6vw,2.4rem)] font-semibold leading-[1.08] tracking-[-0.02em] text-balance sm:text-5xl lg:text-[clamp(2.8rem,4vw,3.9rem)]">
+                  <span className="block text-fg">{hero.title[0]}</span>
+                  <span className="text-gradient block pb-[0.08em]">{hero.title[1]}</span>
+                </h1>
+              </Reveal>
+              <Reveal delay={200}>
+                <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">{hero.subtitle}</p>
+              </Reveal>
+              <Reveal delay={300}>
+                <div className="mt-9 flex flex-wrap justify-center gap-3">
+                  <MagneticButton href={hero.primary.href}>{hero.primary.label}</MagneticButton>
+                  <MagneticButton href={hero.secondary.href} variant="ghost">
+                    {hero.secondary.label}
+                  </MagneticButton>
+                </div>
+              </Reveal>
+              <Reveal delay={350}>
+                <ul className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+                  {hero.proof.map((p) => (
+                    <li key={p} className="flex items-center gap-2">
+                      <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-accent-2" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                        <path d="M3 8.5l3 3 7-7" />
+                      </svg>
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </Reveal>
+              {/* Indicador de scroll: va con el contenido para no montarse encima en pantallas bajas */}
+              <a
+                href="#soluciones"
+                aria-label="Bajar a soluciones"
+                className="mt-14 hidden flex-col items-center gap-2 pl-[0.2em] text-[10px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-fg sm:flex"
+              >
+                Scroll
+                <span className="relative h-9 w-5 rounded-full border border-line-strong">
+                  <span className="absolute left-1/2 top-1.5 h-2 w-0.5 -translate-x-1/2 animate-bounce rounded-full bg-accent-2" />
+                </span>
+              </a>
             </div>
           </div>
 
 
-          <a
-            href="#soluciones"
-            aria-label="Bajar a soluciones"
-            className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-fg sm:flex"
-          >
-            Scroll
-            <span className="relative h-9 w-5 rounded-full border border-line-strong">
-              <span className="absolute left-1/2 top-1.5 h-2 w-0.5 -translate-x-1/2 animate-bounce rounded-full bg-accent-2" />
-            </span>
-          </a>
         </section>
 
         {/* ---------- CAPACIDADES ---------- */}
@@ -136,7 +136,7 @@ export default function Home() {
         <section id="soluciones" data-area="Soluciones" data-area-color="--accent-2" className="scroll-mt-20 pb-20 pt-12 sm:pb-24 sm:pt-16">
           <Module>
             <SectionHead
-              kicker="// Soluciones"
+              kicker="// Qué hacemos"
               title="Un solo equipo para toda tu tecnología."
               text="Del hardware al software y la inteligencia artificial, integrado y operado por especialistas."
             />
@@ -174,7 +174,7 @@ export default function Home() {
         <section id="infraestructura" data-area="Infraestructura" data-area-color="--ok" className="relative scroll-mt-20 py-12 sm:py-16">
           <Module>
             <SectionHead
-              kicker="// Estimador de infraestructura"
+              kicker="// Estimador"
               title="¿Cuánta infraestructura necesitas?"
               text="Indica cuántos servidores tienes o planeas tener y te mostramos al instante cuántos racks ocupan, cuánta energía consumen y qué disponibilidad puedes esperar. Si te sirve, nos envías la configuración y preparamos una propuesta real."
             />
@@ -184,26 +184,30 @@ export default function Home() {
           </Module>
         </section>
 
-        {/* ---------- CIFRAS ---------- */}
-        <section aria-label="Cifras" className="py-12 sm:py-16">
-          <Module glass className="!p-0">
-            <div className="grid grid-cols-2 md:grid-cols-4">
-              {stats.map((s, i) => (
-                <div
-                  key={s.label}
-                  className={`group relative border-[var(--glass-border)] p-6 transition-colors duration-300 hover:bg-white/[0.04] sm:p-8 ${i % 2 === 0 ? "border-r" : ""} ${i < 2 ? "border-b md:border-b-0" : ""} ${i < stats.length - 1 ? "md:border-r" : "md:border-r-0"}`}
-                >
-                  <span
-                    aria-hidden
-                    className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-gradient-to-r from-accent to-accent-2 transition-transform duration-500 group-hover:scale-x-100"
-                  />
-                  <div className="font-display text-4xl font-semibold tracking-tight text-fg tabular-nums sm:text-5xl">
-                    <Counter value={s.value} decimals={s.decimals} suffix={s.suffix} />
+        {/* ---------- CIFRAS + OPERACIÓN EN VIVO ---------- */}
+        <section aria-label="Cifras y operación" className="py-12 sm:py-16">
+          <Module className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-10">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent-2">{"// En cifras"}</p>
+              <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-2">
+                {stats.map((s) => (
+                  <div key={s.label} className="glass-card group relative overflow-hidden rounded-2xl p-5 transition-colors duration-300 hover:bg-white/[0.04] sm:p-6">
+                    <span
+                      aria-hidden
+                      className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-gradient-to-r from-accent to-accent-2 transition-transform duration-500 group-hover:scale-x-100"
+                    />
+                    <div className="font-display text-3xl font-semibold tracking-tight text-fg tabular-nums sm:text-4xl">
+                      <Counter value={s.value} decimals={s.decimals} suffix={s.suffix} />
+                    </div>
+                    <div className="mt-2 text-sm leading-snug text-muted">{s.label}</div>
                   </div>
-                  <div className="mt-2 text-sm text-muted">{s.label}</div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+            {/* Consola de operaciones (decorativa), solo en pantallas anchas */}
+            <Reveal delay={150} className="hidden lg:block">
+              <LiveStatus />
+            </Reveal>
           </Module>
         </section>
 
@@ -211,7 +215,7 @@ export default function Home() {
         <AreaDivider label="Método" />
         <section id="metodo" data-area="Método" data-area-color="--accent-3" className="scroll-mt-20 py-12 sm:py-16">
           <Module>
-            <SectionHead kicker="// Método" title="De la idea a la operación, sin sorpresas." />
+            <SectionHead kicker="// Cómo trabajamos" title="De la idea a la operación, sin sorpresas." />
             <div className="mt-14">
               <MethodTimeline />
             </div>
@@ -229,7 +233,7 @@ export default function Home() {
           <Module className="grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
             <div>
               <SectionHead
-                kicker="// Contacto"
+                kicker="// Hablemos"
                 title="Hablemos de tu próximo proyecto."
                 text="Cuéntanos qué necesitas y un especialista te responde con un diagnóstico inicial sin costo."
               />

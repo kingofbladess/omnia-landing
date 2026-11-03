@@ -356,7 +356,7 @@ export function AreaDivider({ label }: { label: string }) {
   return (
     <div ref={ref} aria-hidden data-in={inView} className="area-divider group mx-auto flex max-w-7xl items-center gap-4 overflow-x-clip px-4 sm:px-6 lg:px-8">
       <span className="relative h-px flex-1 origin-right scale-x-0 bg-gradient-to-l from-accent-2/70 via-line-strong to-transparent transition-transform duration-1000 ease-out group-data-[in=true]:scale-x-100" />
-      <span className="flex translate-y-2 items-center gap-2 rounded-full border border-line-strong bg-bg/80 px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-muted opacity-0 backdrop-blur transition-all delay-300 duration-700 group-data-[in=true]:translate-y-0 group-data-[in=true]:text-fg group-data-[in=true]:opacity-100">
+      <span className="flex translate-y-2 items-center gap-2 rounded-full border border-line-strong bg-bg/80 py-1.5 pl-4 pr-[calc(1rem-0.22em)] font-mono text-[10px] uppercase tracking-[0.22em] text-muted opacity-0 backdrop-blur transition-all delay-300 duration-700 group-data-[in=true]:translate-y-0 group-data-[in=true]:text-fg group-data-[in=true]:opacity-100">
         <span className="led h-1.5 w-1.5 rounded-full bg-accent-2" />
         {label}
       </span>

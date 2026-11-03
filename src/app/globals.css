@@ -42,6 +42,13 @@
 html {
   scroll-behavior: smooth;
   background: var(--bg);
+  /* Escala con la pantalla: 16px hasta 1600px de ancho y crece poco a poco en monitores
+     grandes (≈18px en 1920, ≈22px en 2560, 26px en 4K). Todo lo medido en rem crece en proporción.
+     Los puntos de corte (sm, md, lg…) no cambian: las media queries usan siempre 16px. */
+  /* En rem (= tamaño elegido en el navegador) para respetar a quien lo agranda por accesibilidad. */
+  font-size: clamp(1rem, calc(1rem + (100vw - 100rem) * 0.006), 1.625rem);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 /* El fondo va solo en <html>: si <body> lo tuviera, taparía la red de nodos fija (z-index negativo). */
@@ -49,6 +56,7 @@ body {
   background: transparent;
   color: var(--fg);
   font-family: var(--font-body), system-ui, sans-serif;
+  letter-spacing: 0.006em;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -244,16 +252,190 @@ body {
 }
 
 /* Marca del pie: letras finas solo con contorno; se rellenan de luz donde pasa el cursor */
-.footer-mark {
-  -webkit-text-stroke: 1px rgba(170, 190, 255, 0.28);
-  background-image: radial-gradient(260px circle at var(--fx, 50%) var(--fy, -40%), rgba(0, 209, 255, 0.55), rgba(61, 123, 255, 0.18) 45%, transparent 70%);
+/* ---------- Nombre del pie en 3D ---------- */
+.mark3d {
+  font-family: var(--font-brand), var(--font-display), sans-serif;
+  perspective: 9em;
+  perspective-origin: 50% 30%;
+  padding: 0.32em 0 0.26em;
+}
+.mark3d-stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 0.1em;
+  transform-style: preserve-3d;
+  transform: rotateX(14deg);
+  will-change: transform;
+}
+.mark3d-letter {
+  position: relative;
+  display: inline-block;
+  transform-style: preserve-3d;
+  opacity: 0;
+  transform: translateY(0.35em) translateZ(-1.4em) rotateX(-80deg);
+  transition:
+    transform 1.3s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i) * 0.12s),
+    opacity 0.9s ease calc(var(--i) * 0.12s);
+}
+.mark3d[data-in="true"] .mark3d-letter {
+  opacity: 1;
+  transform: none;
+}
+/* Volumen: copias apiladas hacia atrás, del azul de marca al fondo */
+.mark3d-layer {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(calc(var(--k) * -0.011em));
+  color: color-mix(in srgb, #2f5fd0 calc(100% - var(--k) * 6.5%), #04060b);
+}
+/* Cara frontal: acabado metálico */
+.mark3d-face {
+  position: relative;
+  display: block;
+  background: linear-gradient(180deg, #ffffff 8%, #d4defb 42%, #7d9be6 78%, #4a6fd4 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  transition: -webkit-text-stroke-color 0.4s;
+  /* Halo suave (más barato que un filtro al girar en 3D) */
+  text-shadow: 0 0 0.12em rgba(0, 209, 255, 0.22);
 }
-.footer-mark:hover {
-  -webkit-text-stroke-color: rgba(170, 210, 255, 0.45);
+/* Brillo que recorre las letras */
+.mark3d-face::after {
+  content: attr(data-c);
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.95) 50%, transparent 62%);
+  background-size: 300% 100%;
+  background-position: 120% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.mark3d[data-in="true"] .mark3d-face::after {
+  animation: mark-shine 6.5s cubic-bezier(0.45, 0, 0.2, 1) calc(1.4s + var(--i) * 0.09s) infinite;
+}
+@keyframes mark-shine {
+  0% {
+    background-position: 120% 0;
+  }
+  28%,
+  100% {
+    background-position: -40% 0;
+  }
+}
+/* Suelo con rejilla que se pierde en el horizonte */
+.mark3d-floor {
+  position: absolute;
+  left: 50%;
+  bottom: -0.05em;
+  width: 7em;
+  height: 1.6em;
+  transform: translateX(-50%) rotateX(78deg);
+  transform-origin: 50% 100%;
+  background-image:
+    linear-gradient(rgba(120, 160, 255, 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 160, 255, 0.22) 1px, transparent 1px);
+  background-size: 0.32em 0.32em;
+  mask-image: radial-gradient(ellipse 50% 60% at 50% 100%, #000 20%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 50% 60% at 50% 100%, #000 20%, transparent 75%);
+  opacity: 0;
+  transition: opacity 1.2s ease 0.6s;
+  pointer-events: none;
+}
+.mark3d-glow {
+  position: absolute;
+  left: 50%;
+  bottom: 0.05em;
+  width: 4.2em;
+  height: 0.5em;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(0, 209, 255, 0.35), rgba(61, 123, 255, 0.12) 60%, transparent);
+  filter: blur(0.12em);
+  opacity: 0;
+  transition: opacity 1.2s ease 0.9s;
+  pointer-events: none;
+}
+.mark3d[data-in="true"] .mark3d-floor,
+.mark3d[data-in="true"] .mark3d-glow {
+  opacity: 1;
+}
+
+/* ---------- Entrada "construcción" (portada) ----------
+   1) contornos que se juntan  2) escaneo + relleno de abajo arriba
+   3) crece el volumen hacia atrás  4) suelo, halo y brillo */
+.mark3d[data-intro="build"] .mark3d-letter {
+  transform: translateX(calc((var(--i) - var(--mid)) * 0.28em));
+  transition:
+    transform 1.4s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i) * 0.05s),
+    opacity 0.7s ease calc(var(--i) * 0.05s);
+}
+.mark3d[data-intro="build"] .mark3d-face {
+  background-repeat: no-repeat;
+  background-position: 50% 100%;
+  background-size: 100% 0%;
+  -webkit-text-stroke: 0.012em rgba(150, 195, 255, 0.9);
+  transition:
+    background-size 1.1s cubic-bezier(0.65, 0, 0.25, 1) calc(0.65s + var(--i) * 0.08s),
+    -webkit-text-stroke-color 0.8s ease calc(1.45s + var(--i) * 0.08s);
+}
+.mark3d[data-intro="build"][data-in="true"] .mark3d-face {
+  background-size: 100% 100%;
+  -webkit-text-stroke-color: transparent;
+}
+.mark3d[data-intro="build"] .mark3d-layer {
+  opacity: 0;
+  transform: translateZ(0);
+  transition:
+    transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) calc(1.55s + var(--i) * 0.06s + var(--k) * 0.02s),
+    opacity 0.25s linear calc(1.55s + var(--i) * 0.06s + var(--k) * 0.02s);
+}
+.mark3d[data-intro="build"][data-in="true"] .mark3d-layer {
+  opacity: 1;
+  transform: translateZ(calc(var(--k) * -0.011em));
+}
+.mark3d[data-intro="build"] .mark3d-floor {
+  transition-delay: 2s;
+}
+.mark3d[data-intro="build"] .mark3d-glow {
+  transition-delay: 2.2s;
+}
+.mark3d[data-intro="build"][data-in="true"] .mark3d-face::after {
+  animation-delay: calc(2.8s + var(--i) * 0.09s);
+}
+/* Haz de escaneo que sube mientras las letras se llenan */
+.mark3d-scan {
+  position: absolute;
+  left: 50%;
+  top: 1.08em;
+  width: 5.6em;
+  height: 0.02em;
+  min-height: 2px;
+  transform: translate(-50%, 0);
+  background: linear-gradient(90deg, transparent, rgba(0, 209, 255, 0.95) 20%, #fff 50%, rgba(0, 209, 255, 0.95) 80%, transparent);
+  box-shadow: 0 0 0.12em 0.02em rgba(0, 209, 255, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.mark3d[data-in="true"] .mark3d-scan {
+  animation: mark-scan 1.35s cubic-bezier(0.65, 0, 0.25, 1) 0.6s both;
+}
+@keyframes mark-scan {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0);
+  }
+  12% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -0.82em);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -271,8 +453,10 @@ body {
   .divider-beam {
     animation: none !important;
   }
-  .area-divider * {
+  .area-divider *,
+  .mark3d * {
     transition: none !important;
+    animation: none !important;
   }
 }
 

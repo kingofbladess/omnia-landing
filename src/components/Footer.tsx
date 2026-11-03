@@ -5,7 +5,7 @@ import { BackToTop, FooterMark } from "./FooterInteractive";
 import { Logo } from "./Header";
 import { MagneticButton } from "./interactive";
 
-const linkClass = "group inline-flex items-center text-muted transition-colors hover:text-fg";
+const linkClass = "group flex items-center text-left leading-5 text-muted transition-colors hover:text-fg";
 
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -16,9 +16,9 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
   );
 }
 
-function Column({ title, children }: { title: string; children: React.ReactNode }) {
+function Column({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <div>
+    <div className={className}>
       <h2 className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent-2">{title}</h2>
       <ul className="mt-5 space-y-3 text-sm">{children}</ul>
     </div>
@@ -41,38 +41,34 @@ export function Footer() {
 
       {/* ---------- Llamado final ---------- */}
       <div className="mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 sm:pt-32 lg:px-8">
-        <div className="grid items-end gap-10 lg:grid-cols-[1.4fr_1fr]">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent-2">{"// Siguiente paso"}</p>
-            <h2 className="mt-4 font-display text-5xl font-semibold leading-[0.98] tracking-[-0.03em] text-balance sm:text-6xl lg:text-7xl">
-              <span className="block text-fg">Construyamos</span>
-              <span className="text-gradient block pb-[0.08em]">lo que sigue.</span>
-            </h2>
-          </div>
-          <div className="lg:pb-3">
-            <p className="max-w-md text-base leading-relaxed text-muted sm:text-lg">
-              Cuéntanos tu reto y un especialista te responde con un diagnóstico inicial, sin costo.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <MagneticButton href="/#contacto">Agenda una consultoría</MagneticButton>
-              {site.whatsapp ? (
-                <MagneticButton href={`https://wa.me/${site.whatsapp}`} variant="ghost">
-                  WhatsApp
-                </MagneticButton>
-              ) : (
-                <MagneticButton href={`mailto:${site.email}`} variant="ghost">
-                  Escríbenos
-                </MagneticButton>
-              )}
-            </div>
+        <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent-2">{"// Siguiente paso"}</p>
+          <h2 className="mt-4 font-display text-5xl font-semibold leading-[1] tracking-[-0.025em] text-balance sm:text-6xl lg:text-7xl">
+            <span className="block text-fg">Construyamos</span>
+            <span className="text-gradient block pb-[0.08em]">lo que sigue.</span>
+          </h2>
+          <p className="mx-auto mt-6 max-w-md text-base leading-relaxed text-muted sm:text-lg">
+            Cuéntanos tu reto y un especialista te responde con un diagnóstico inicial, sin costo.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <MagneticButton href="/#contacto">Agenda una consultoría</MagneticButton>
+            {site.whatsapp ? (
+              <MagneticButton href={`https://wa.me/${site.whatsapp}`} variant="ghost">
+                WhatsApp
+              </MagneticButton>
+            ) : (
+              <MagneticButton href={`mailto:${site.email}`} variant="ghost">
+                Escríbenos
+              </MagneticButton>
+            )}
           </div>
         </div>
       </div>
 
       {/* ---------- Enlaces y datos ---------- */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="glass grid gap-12 rounded-[2rem] p-8 sm:grid-cols-2 sm:p-10 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
-          <div>
+        <div className="glass grid grid-cols-2 gap-x-6 gap-y-10 rounded-[2rem] p-7 sm:gap-12 sm:p-10 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
+          <div className="col-span-2 lg:col-span-1">
             <Logo />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-muted">
               {site.tagline}. Data center, software, inteligencia artificial y cloud segura.
@@ -115,7 +111,7 @@ export function Footer() {
             </li>
           </Column>
 
-          <Column title="Legal">
+          <Column title="Legal" className="col-span-2 lg:col-span-1">
             <li>
               <FooterLink href="/terminos">Términos y Condiciones</FooterLink>
             </li>
@@ -135,7 +131,7 @@ export function Footer() {
       {/* ---------- Marca gigante ---------- */}
       <div className="relative overflow-hidden px-2 pb-10 pt-16 sm:pb-14 sm:pt-20">
         <FooterMark text={site.name} />
-        <p className="mt-4 text-center font-mono text-[10px] uppercase tracking-[0.5em] text-muted/70">Tecnología e Infraestructura</p>
+        <p className="mt-4 pl-[0.5em] text-center font-mono text-[10px] uppercase tracking-[0.5em] text-muted/70">Tecnología e Infraestructura</p>
       </div>
 
       {/* ---------- Barra inferior ---------- */}

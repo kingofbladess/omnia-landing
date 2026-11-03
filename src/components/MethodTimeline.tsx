@@ -22,24 +22,33 @@ export function MethodTimeline() {
   const [active, setActive] = useState(0);
 
   useEffect(() => {
-    const onScroll = () => {
+    // Como mucho un cálculo por fotograma, y solo se vuelve a pintar si el valor cambia.
+    let raf = 0;
+    const update = () => {
+      raf = 0;
       const el = ref.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
       const vh = window.innerHeight;
-      const p = Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (r.height + vh * 0.35)));
+      const p = Math.round(Math.min(1, Math.max(0, (vh * 0.85 - r.top) / (r.height + vh * 0.35))) * 200) / 200;
       setProgress(p);
       setActive(Math.min(method.length - 1, Math.floor(p * method.length)));
     };
-    onScroll();
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   return (
     <ol ref={ref} className="relative grid gap-6 md:grid-cols-4 md:gap-5">
       {/* Línea de progreso: horizontal en escritorio, vertical en móvil */}
-      <div aria-hidden className="absolute left-7 right-7 top-7 hidden h-px bg-line md:block">
+      <div aria-hidden className="absolute left-7 right-[calc((100%-3.75rem)/4-1.75rem)] top-7 hidden h-px bg-line md:block">
         <div className="h-full bg-gradient-to-r from-accent to-accent-2 transition-[width] duration-200" style={{ width: `${progress * 100}%` }} />
       </div>
       <div aria-hidden className="absolute bottom-7 left-7 top-7 w-px bg-line md:hidden">

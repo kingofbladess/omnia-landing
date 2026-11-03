@@ -66,8 +66,8 @@ export function Header({ areaBar = false }: { areaBar?: boolean }) {
         aria-hidden
         className={`pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-bg via-bg/70 to-transparent transition-opacity duration-300 ${scrolled ? "opacity-100" : "opacity-0"}`}
       />
-      <div className={`relative mx-auto flex max-w-7xl items-center justify-between px-4 transition-[height] duration-300 sm:px-6 lg:px-8 ${scrolled ? "h-16" : "h-20"}`}>
-        <div className="glass-pill rounded-full py-1.5 pl-2 pr-4">
+      <div className={`relative mx-auto flex max-w-7xl items-center justify-between px-4 transition-[height] duration-300 sm:px-6 md:grid md:grid-cols-[1fr_auto_1fr] lg:px-8 ${scrolled ? "h-16" : "h-20"}`}>
+        <div className="glass-pill w-fit justify-self-start rounded-full py-1.5 pl-2 pr-4">
           <Logo />
         </div>
 
@@ -86,7 +86,7 @@ export function Header({ areaBar = false }: { areaBar?: boolean }) {
           })}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 justify-self-end">
           <Link
             href={account.href}
             className={`glass-pill hidden items-center gap-2 rounded-full px-4 py-2 text-sm text-fg transition-[background-color,opacity] duration-300 hover:bg-white/10 sm:inline-flex ${user === undefined ? "opacity-0" : "opacity-100"}`}
