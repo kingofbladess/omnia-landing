@@ -139,7 +139,7 @@ export function Footer() {
         <div className="mx-auto flex max-w-7xl flex-col items-start gap-4 px-4 py-5 text-xs text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <p>
             © {year} {legalName}. <span className="whitespace-nowrap">RIF {site.rif}.</span>
-            <span className="hidden sm:inline"> Hecho en Maracaibo, Venezuela.</span>
+            <span className="hidden sm:inline"> Hecho en Caracas, Venezuela.</span>
           </p>
           <BackToTop />
         </div>

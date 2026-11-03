@@ -20,9 +20,9 @@ export const site = {
   phone: "+58 000 000 0000",
   /** Número de WhatsApp con código de país, solo dígitos (ej. "584141234567"). Vacío = no se muestra el botón. */
   whatsapp: "",
-  city: "Maracaibo, Zulia, Venezuela",
-  address:
-    "Calle 67 con Avenida 3F, C.C. Camoruco, nivel PB, local 1-03, sector Bellas Artes, Maracaibo, estado Zulia, zona postal 4002",
+  city: "Caracas, Venezuela",
+  /** PENDIENTE: completar con la dirección exacta en Caracas (calle, edificio/C.C., local, urbanización, zona postal). */
+  address: "Caracas, Distrito Capital, Venezuela",
   tagline: "Innovación tecnológica de punta a punta",
 };
 
@@ -40,7 +40,7 @@ export const hero = {
     "Diseñamos, construimos y operamos la tecnología crítica de tu empresa: desde el rack hasta la última línea de código.",
   primary: { label: "Agenda una consultoría", href: "#contacto" },
   secondary: { label: "Explora soluciones", href: "#soluciones" },
-  proof: ["Soporte 24/7", "Diagnóstico sin costo", "Desde Maracaibo"],
+  proof: ["Soporte 24/7", "Diagnóstico sin costo", "Desde Caracas"],
 };
 
 export const capabilities = [

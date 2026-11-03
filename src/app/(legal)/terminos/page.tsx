@@ -78,7 +78,7 @@ export default function Terminos() {
       <h2>10. Ley aplicable y jurisdicción</h2>
       <p>
         Estos Términos se rigen por las leyes de la República Bolivariana de Venezuela, incluida la Ley sobre Mensajes de
-        Datos y Firmas Electrónicas. Cualquier controversia se someterá a los tribunales competentes de la ciudad de Maracaibo, estado Zulia.
+        Datos y Firmas Electrónicas. Cualquier controversia se someterá a los tribunales competentes de la ciudad de Caracas, Distrito Capital.
       </p>
 
       <h2>11. Contacto</h2>
