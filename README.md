@@ -39,9 +39,16 @@ update public.profiles set role = 'admin' where email = 'tu-correo@ejemplo.com';
 
 1. Entra a [vercel.com](https://vercel.com) con tu cuenta de GitHub → **Add New → Project** → elige `omnia-landing`.
 2. En **Environment Variables** agrega `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` → **Deploy**.
-3. En el proyecto: **Settings → Domains → Add** y escribe tu dominio.
-4. Vercel te mostrará dos *nameservers* (`ns1.vercel-dns.com`, `ns2.vercel-dns.com`). Colócalos en el panel de tu registrador (para `.ve`, en **nic.ve**). La propagación puede tardar de minutos a 48 horas.
-5. Actualiza la *Site URL* de Supabase con el dominio final.
+3. En el proyecto: **Settings → Domains → Add** y agrega `omnia.ia.ve` y `www.omnia.ia.ve` (que `www` redirija al dominio principal).
+4. El DNS de `omnia.ia.ve` está en **Cloudflare** (nameservers `hassan` / `evelyn.ns.cloudflare.com`), así que **no cambies los nameservers**. En Cloudflare → **DNS → Records** crea los registros que te indique Vercel, normalmente:
+
+   | Tipo | Nombre | Valor | Proxy |
+   | --- | --- | --- | --- |
+   | `A` | `@` | IP que muestra Vercel (p. ej. `76.76.21.21`) | **DNS only** (nube gris) |
+   | `CNAME` | `www` | `cname.vercel-dns.com` | **DNS only** (nube gris) |
+
+   Con la nube gris, Vercel emite el certificado SSL automáticamente. Suele tardar unos minutos.
+5. En Supabase → **Authentication → URL Configuration**: *Site URL* `https://omnia.ia.ve` y agrega `https://omnia.ia.ve/**` en *Redirect URLs*.
 
 ## Estructura
 
