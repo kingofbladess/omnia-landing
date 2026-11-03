@@ -24,7 +24,7 @@ export function LiveStatus() {
   return (
     <div
       aria-hidden
-      className="relative w-[400px] overflow-hidden rounded-2xl border border-line-strong bg-[#08101e]/80 font-mono text-xs shadow-[0_40px_100px_-30px_rgba(61,123,255,0.5)] backdrop-blur-md"
+      className="glass relative w-[400px] overflow-hidden rounded-2xl font-mono text-xs"
     >
       <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-2/70 to-transparent" />
 

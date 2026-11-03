@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { nav } from "@/content/site";
+import { useAccount } from "@/lib/supabase/account";
 
 export function Logo({ className = "" }: { className?: string }) {
   return (
@@ -23,7 +24,10 @@ export function Logo({ className = "" }: { className?: string }) {
   );
 }
 
-export function Header({ user }: { user?: { isAdmin: boolean } | null }) {
+/** `areaBar`: deja espacio a la izquierda para la barra de áreas de la página principal. */
+export function Header({ areaBar = false }: { areaBar?: boolean }) {
+  // La sesión se mantiene al volver a la página principal: el botón lleva a tu cuenta.
+  const user = useAccount();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
@@ -56,21 +60,25 @@ export function Header({ user }: { user?: { isAdmin: boolean } | null }) {
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled || open ? "border-b border-line bg-bg/80 backdrop-blur-xl" : "border-b border-transparent"
-      }`}
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${areaBar ? "lg:pl-20 2xl:pl-0" : ""} ${open ? "bg-bg/90 backdrop-blur-xl" : ""}`}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Logo />
+      <div
+        aria-hidden
+        className={`pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-bg via-bg/70 to-transparent transition-opacity duration-300 ${scrolled ? "opacity-100" : "opacity-0"}`}
+      />
+      <div className={`relative mx-auto flex max-w-7xl items-center justify-between px-4 transition-[height] duration-300 sm:px-6 lg:px-8 ${scrolled ? "h-16" : "h-20"}`}>
+        <div className="glass-pill rounded-full py-1.5 pl-2 pr-4">
+          <Logo />
+        </div>
 
-        <nav aria-label="Principal" className="hidden items-center gap-1 rounded-full border border-line bg-white/[0.02] p-1 md:flex">
+        <nav aria-label="Principal" className="glass-pill hidden items-center gap-1 rounded-full p-1 md:flex">
           {nav.map((n) => {
             const isActive = active === n.href.slice(1);
             return (
               <Link
                 key={n.href}
                 href={`/${n.href}`}
-                className={`relative rounded-full px-4 py-1.5 text-sm transition-colors ${isActive ? "bg-white/[0.08] text-fg" : "text-muted hover:text-fg"}`}
+                className={`relative rounded-full px-4 py-1.5 text-sm transition-colors ${isActive ? "bg-fg text-bg" : "text-muted hover:bg-white/[0.06] hover:text-fg"}`}
               >
                 {n.label}
               </Link>
@@ -81,8 +89,9 @@ export function Header({ user }: { user?: { isAdmin: boolean } | null }) {
         <div className="flex items-center gap-2">
           <Link
             href={account.href}
-            className="hidden rounded-full border border-line-strong px-4 py-1.5 text-sm text-fg transition-colors hover:border-accent-2/60 hover:bg-white/5 sm:inline-flex"
+            className={`glass-pill hidden items-center gap-2 rounded-full px-4 py-2 text-sm text-fg transition-[background-color,opacity] duration-300 hover:bg-white/10 sm:inline-flex ${user === undefined ? "opacity-0" : "opacity-100"}`}
           >
+            {user && <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-ok" />}
             {account.label}
           </Link>
           <button
@@ -91,7 +100,7 @@ export function Header({ user }: { user?: { isAdmin: boolean } | null }) {
             aria-expanded={open}
             aria-controls="mobile-menu"
             onClick={() => setOpen((v) => !v)}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-line md:hidden"
+            className="glass-pill relative flex h-10 w-10 items-center justify-center rounded-full md:hidden"
           >
             <span className={`absolute h-px w-4 bg-fg transition-transform duration-300 ${open ? "rotate-45" : "-translate-y-1"}`} />
             <span className={`absolute h-px w-4 bg-fg transition-transform duration-300 ${open ? "-rotate-45" : "translate-y-1"}`} />

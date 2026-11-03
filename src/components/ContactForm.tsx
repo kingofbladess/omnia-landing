@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { submitLead, type FormState } from "@/app/actions";
+import { getAccount } from "@/lib/supabase/account";
 import { MagneticButton } from "./interactive";
 
 const input =
@@ -26,6 +27,33 @@ export function ContactForm() {
   const [state, action, pending] = useActionState<FormState, FormData>(submitLead, null);
   const [message, setMessage] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
+
+  // Si hay sesión, llena solo los campos vacíos con los datos del perfil (empresa, teléfono…).
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const account = await getAccount();
+        if (!account || cancelled) return;
+        const { user, profile: p } = account;
+        const form = formRef.current;
+        if (!form || cancelled) return;
+        const fill = (name: string, value?: string | null) => {
+          const el = form.elements.namedItem(name) as HTMLInputElement | null;
+          if (el && !el.value && value) el.value = value;
+        };
+        fill("name", p?.full_name);
+        fill("email", user.email);
+        fill("company", p?.company);
+        fill("phone", p?.phone);
+      } catch {
+        /* sin sesión o sin conexión: el formulario funciona igual */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Recibe el mensaje pre-armado desde el configurador de racks.
   useEffect(() => {

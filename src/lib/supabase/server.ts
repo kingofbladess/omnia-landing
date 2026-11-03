@@ -22,6 +22,18 @@ export async function createClient() {
 
 export type Role = "user" | "admin";
 
+export type Profile = {
+  id: string;
+  email: string;
+  full_name: string | null;
+  role: Role;
+  created_at: string;
+  company: string | null;
+  rif: string | null;
+  phone: string | null;
+  job_title: string | null;
+};
+
 /** Devuelve el usuario actual y su rol (o null si no hay sesión). */
 export async function getCurrentUser() {
   const supabase = await createClient();
@@ -31,8 +43,8 @@ export async function getCurrentUser() {
   if (!user) return { supabase, user: null, profile: null };
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, email, full_name, role, created_at")
+    .select("id, email, full_name, role, created_at, company, rif, phone, job_title")
     .eq("id", user.id)
     .single();
-  return { supabase, user, profile: profile as { id: string; email: string; full_name: string | null; role: Role; created_at: string } | null };
+  return { supabase, user, profile: profile as Profile | null };
 }

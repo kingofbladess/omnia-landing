@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { NotConfigured } from "@/components/AppShell";
 import { AuthForm } from "@/components/AuthForm";
 import { Logo } from "@/components/Header";
+import { MathCollider } from "@/components/MathCollider";
+import { safeRedirect } from "@/lib/safe-redirect";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
 
@@ -21,19 +23,36 @@ export default async function Acceso({ searchParams }: { searchParams: Promise<{
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (user) redirect("/cuenta");
+  // Con sesión: entrar directo, salvo que falte el código de verificación en dos pasos.
+  let needsMfa = false;
+  if (user) {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    needsMfa = aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2";
+    if (!needsMfa) redirect(safeRedirect(next));
+  }
 
   return (
     <main className="relative grid min-h-screen lg:grid-cols-2">
-      <div className="relative hidden overflow-hidden border-r border-line bg-bg-2 lg:block">
-        <div aria-hidden className="grid-bg absolute inset-0 opacity-50" />
+      <div className="relative hidden overflow-hidden border-r border-line bg-bg lg:block">
+        {/* Espacio profundo: nebulosas suaves detrás de las estrellas */}
         <div
           aria-hidden
-          className="absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-50 blur-3xl"
-          style={{ background: "radial-gradient(closest-side, rgba(61,123,255,0.55), transparent)" }}
+          className="absolute inset-0"
+          style={{
+            background: [
+              "radial-gradient(60% 45% at 78% 18%, rgba(139,124,255,0.20), transparent 70%)",
+              "radial-gradient(55% 50% at 15% 70%, rgba(61,123,255,0.18), transparent 70%)",
+              "radial-gradient(40% 30% at 55% 45%, rgba(0,209,255,0.08), transparent 70%)",
+              "radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(0,0,0,0.6))",
+            ].join(","),
+          }}
         />
-        <div className="relative flex h-full flex-col justify-between p-12">
-          <Logo />
+        <MathCollider />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-bg via-bg/80 to-transparent" />
+        <div className="pointer-events-none relative flex h-full flex-col justify-between p-12">
+          <div className="pointer-events-auto">
+            <Logo />
+          </div>
           <div>
             <p className="font-display text-4xl font-semibold leading-tight text-fg">
               Tu infraestructura,
@@ -51,7 +70,7 @@ export default async function Acceso({ searchParams }: { searchParams: Promise<{
           </div>
           <h1 className="mb-8 font-display text-3xl font-semibold text-fg">Bienvenido</h1>
           {error && <p className="mb-4 text-sm text-[#ff8a8a]">El enlace expiró o no es válido. Inténtalo de nuevo.</p>}
-          <AuthForm next={next} />
+          <AuthForm next={next} mfa={needsMfa} />
         </div>
       </div>
     </main>

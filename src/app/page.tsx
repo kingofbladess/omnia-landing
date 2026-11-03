@@ -1,7 +1,7 @@
 import { ContactForm } from "@/components/ContactForm";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { HeroCanvas } from "@/components/HeroCanvas";
+import { AreaDivider, AreaSystem } from "@/components/AreaSystem";
 import { Counter, MagneticButton, Reveal, SpotCard } from "@/components/interactive";
 import { LiveStatus } from "@/components/LiveStatus";
 import { MethodTimeline } from "@/components/MethodTimeline";
@@ -18,8 +18,20 @@ function SectionHead({ kicker, title, text }: { kicker: string; title: string; t
   );
 }
 
+/** Panel de vidrio que envuelve cada sección (estilo dashboard). */
+function Module({ children, className = "", glass = false }: { children: React.ReactNode; className?: string; glass?: boolean }) {
+  // Por defecto es un marco sin desenfoque y las tarjetas de dentro hacen el vidrio.
+  // glass: el propio panel es de vidrio (solo si no lleva tarjetas de vidrio dentro).
+  return (
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className={`${glass ? "glass" : "glass-frame"} relative overflow-hidden rounded-[2rem] p-6 sm:p-10 lg:p-12 ${className}`}>{children}</div>
+    </div>
+  );
+}
+
 const icons: Record<string, React.ReactNode> = {
   dc: <path d="M4 5h16v4H4zM4 10h16v4H4zM4 15h16v4H4zM7 7h.01M7 12h.01M7 17h.01" />,
+  srv: <path d="M5 3h14v18H5zM8 7h8M8 10.5h8M8 14h3M15.5 17.5h.01M12.5 17.5h.01" />,
   sw: <path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13 6l-2 12" />,
   ai: <path d="M12 3v3M12 18v3M3 12h3M18 12h3M7 7h10v10H7zM10 10h4v4h-4z" />,
   sec: <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6zM9 12l2 2 4-4" />,
@@ -28,19 +40,18 @@ const icons: Record<string, React.ReactNode> = {
 export default function Home() {
   return (
     <>
-      <Header />
+      <Header areaBar />
+      <AreaSystem />
+      <div className="lg:pl-20 2xl:pl-0">
       <main id="inicio">
         {/* ---------- HERO ---------- */}
-        <section className="relative isolate flex min-h-[100svh] items-center overflow-hidden pt-16">
+        <section id="hero" data-area="Inicio" data-area-color="--accent" className="relative isolate flex min-h-[100svh] items-center overflow-hidden pt-16">
           <div aria-hidden className="grid-bg absolute inset-0 -z-20 opacity-60" />
           <div
             aria-hidden
             className="absolute left-1/2 top-[-20%] -z-10 h-[680px] w-[980px] -translate-x-1/2 rounded-full opacity-50 blur-3xl"
             style={{ background: "radial-gradient(closest-side, rgba(61,123,255,0.45), rgba(0,209,255,0.12), transparent)" }}
           />
-          <div className="absolute inset-0 -z-10">
-            <HeroCanvas />
-          </div>
 
           <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
             <Reveal>
@@ -88,7 +99,6 @@ export default function Home() {
             </div>
           </div>
 
-          <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-b from-transparent to-bg" />
 
           <a
             href="#soluciones"
@@ -103,7 +113,11 @@ export default function Home() {
         </section>
 
         {/* ---------- CAPACIDADES ---------- */}
-        <div className="relative overflow-hidden border-y border-line bg-bg-2 py-5" aria-label="Capacidades">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Capacidades">
+          <div
+            className="glass-pill relative overflow-hidden rounded-full py-4"
+            style={{ maskImage: "linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent)", WebkitMaskImage: "linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent)" }}
+          >
           <div className="marquee flex w-max gap-12 pr-12">
             {[...capabilities, ...capabilities].map((c, i) => (
               <span key={i} aria-hidden={i >= capabilities.length} className="flex items-center gap-12 whitespace-nowrap font-display text-lg text-muted">
@@ -112,13 +126,15 @@ export default function Home() {
               </span>
             ))}
           </div>
-          <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-bg-2 to-transparent" />
-          <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-bg-2 to-transparent" />
+          </div>
         </div>
 
         {/* ---------- SOLUCIONES ---------- */}
-        <section id="soluciones" className="scroll-mt-20 py-24 sm:py-32">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="pt-24 sm:pt-28">
+          <AreaDivider label="Soluciones" />
+        </div>
+        <section id="soluciones" data-area="Soluciones" data-area-color="--accent-2" className="scroll-mt-20 pb-20 pt-12 sm:pb-24 sm:pt-16">
+          <Module>
             <SectionHead
               kicker="// Soluciones"
               title="Un solo equipo para toda tu tecnología."
@@ -126,14 +142,8 @@ export default function Home() {
             />
             <div className="mt-14 grid gap-4 md:grid-cols-2">
               {solutions.map((s, i) => (
-                <Reveal key={s.id} delay={i * 80}>
-                  <SpotCard className="group relative h-full overflow-hidden p-7 sm:p-8">
-                    <span
-                      aria-hidden
-                      className="pointer-events-none absolute -right-3 -top-6 select-none font-display text-[8rem] font-semibold leading-none text-white/[0.025] transition-colors duration-500 group-hover:text-accent/[0.07]"
-                    >
-                      {s.code}
-                    </span>
+                <Reveal key={s.id} delay={i * 80} className={solutions.length % 2 === 1 && i === solutions.length - 1 ? "md:col-span-2" : ""}>
+                  <SpotCard className="glass-see group relative h-full overflow-hidden p-7 sm:p-8">
                     <div aria-hidden className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-line-strong to-transparent" />
                     <div className="relative flex items-start justify-between">
                       <span className="flex h-12 w-12 items-center justify-center rounded-xl border border-line-strong bg-accent/10 text-accent-2 transition-colors duration-300 group-hover:bg-accent group-hover:text-white">
@@ -156,30 +166,33 @@ export default function Home() {
                 </Reveal>
               ))}
             </div>
-          </div>
+          </Module>
         </section>
 
         {/* ---------- INFRAESTRUCTURA ---------- */}
-        <section id="infraestructura" className="relative scroll-mt-20 border-y border-line bg-bg-2 py-24 sm:py-32">
-          <div aria-hidden className="grid-bg absolute inset-0 opacity-30" />
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <AreaDivider label="Infraestructura" />
+        <section id="infraestructura" data-area="Infraestructura" data-area-color="--ok" className="relative scroll-mt-20 py-12 sm:py-16">
+          <Module>
             <SectionHead
-              kicker="// Configurador"
-              title="Diseña tu infraestructura en segundos."
-              text="Mueve el control y activa opciones: el rack se arma en vivo y te sugerimos un plan."
+              kicker="// Estimador de infraestructura"
+              title="¿Cuánta infraestructura necesitas?"
+              text="Indica cuántos servidores tienes o planeas tener y te mostramos al instante cuántos racks ocupan, cuánta energía consumen y qué disponibilidad puedes esperar. Si te sirve, nos envías la configuración y preparamos una propuesta real."
             />
             <Reveal delay={100} className="mt-14">
               <RackConfigurator />
             </Reveal>
-          </div>
+          </Module>
         </section>
 
         {/* ---------- CIFRAS ---------- */}
-        <section aria-label="Cifras" className="py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-4">
-              {stats.map((s) => (
-                <div key={s.label} className="group relative bg-bg p-6 transition-colors duration-300 hover:bg-panel sm:p-8">
+        <section aria-label="Cifras" className="py-12 sm:py-16">
+          <Module glass className="!p-0">
+            <div className="grid grid-cols-2 md:grid-cols-4">
+              {stats.map((s, i) => (
+                <div
+                  key={s.label}
+                  className={`group relative border-[var(--glass-border)] p-6 transition-colors duration-300 hover:bg-white/[0.04] sm:p-8 ${i % 2 === 0 ? "border-r" : ""} ${i < 2 ? "border-b md:border-b-0" : ""} ${i < stats.length - 1 ? "md:border-r" : "md:border-r-0"}`}
+                >
                   <span
                     aria-hidden
                     className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-gradient-to-r from-accent to-accent-2 transition-transform duration-500 group-hover:scale-x-100"
@@ -191,27 +204,29 @@ export default function Home() {
                 </div>
               ))}
             </div>
-          </div>
+          </Module>
         </section>
 
         {/* ---------- MÉTODO ---------- */}
-        <section id="metodo" className="scroll-mt-20 py-24 sm:py-32">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <AreaDivider label="Método" />
+        <section id="metodo" data-area="Método" data-area-color="--accent-3" className="scroll-mt-20 py-12 sm:py-16">
+          <Module>
             <SectionHead kicker="// Método" title="De la idea a la operación, sin sorpresas." />
             <div className="mt-14">
               <MethodTimeline />
             </div>
-          </div>
+          </Module>
         </section>
 
         {/* ---------- CONTACTO ---------- */}
-        <section id="contacto" className="relative scroll-mt-20 overflow-hidden border-t border-line py-24 sm:py-32">
+        <AreaDivider label="Contacto" />
+        <section id="contacto" data-area="Contacto" data-area-color="--accent" className="relative scroll-mt-20 overflow-hidden py-12 sm:py-16">
           <div
             aria-hidden
             className="absolute -right-40 top-10 -z-10 h-[520px] w-[520px] rounded-full opacity-40 blur-3xl"
             style={{ background: "radial-gradient(closest-side, rgba(61,123,255,0.5), transparent)" }}
           />
-          <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[1fr_1.2fr] lg:px-8">
+          <Module className="grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
             <div>
               <SectionHead
                 kicker="// Contacto"
@@ -219,31 +234,58 @@ export default function Home() {
                 text="Cuéntanos qué necesitas y un especialista te responde con un diagnóstico inicial sin costo."
               />
               <Reveal delay={100}>
-                <dl className="mt-10 space-y-5 text-sm">
-                  <div>
-                    <dt className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">Correo</dt>
-                    <dd className="mt-1">
-                      <a href={`mailto:${site.email}`} className="text-lg text-fg hover:text-accent-2">
-                        {site.email}
-                      </a>
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">Ubicación</dt>
-                    <dd className="mt-1 text-lg text-fg">{site.city}</dd>
-                  </div>
+                <dl className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-3">
+                  {[
+                    {
+                      k: "Correo",
+                      v: (
+                        <a href={`mailto:${site.email}`} className="transition-colors hover:text-accent-2">
+                          {site.email}
+                        </a>
+                      ),
+                      icon: <path d="M3 6h18v12H3zM3 7l9 6 9-6" />,
+                    },
+                    { k: "Ubicación", v: site.city, icon: <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21zM12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" /> },
+                    { k: "Atención", v: "Soporte 24/7 · Diagnóstico sin costo", icon: <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2" /> },
+                  ].map((item) => (
+                    <SpotCard key={item.k} tilt={false} className="flex items-center gap-4 px-5 py-4">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-line-strong bg-accent/10 text-accent-2">
+                        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          {item.icon}
+                        </svg>
+                      </span>
+                      <div className="min-w-0">
+                        <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">{item.k}</dt>
+                        <dd className="mt-1 truncate text-base text-fg">{item.v}</dd>
+                      </div>
+                    </SpotCard>
+                  ))}
                 </dl>
               </Reveal>
             </div>
             <Reveal delay={150}>
-              <div className="rounded-2xl border border-line bg-panel/60 p-6 backdrop-blur sm:p-8">
-                <ContactForm />
+              <div className="glass-card relative overflow-hidden rounded-2xl">
+                <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-2/70 to-transparent" />
+                <div className="flex items-center justify-between gap-4 border-b border-line px-6 py-4 sm:px-8">
+                  <div>
+                    <p className="font-display text-lg font-semibold text-fg">Solicitud de diagnóstico</p>
+                    <p className="mt-0.5 text-xs text-muted">Los campos con * son obligatorios.</p>
+                  </div>
+                  <span className="hidden items-center gap-2 rounded-full border border-ok/30 bg-ok/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-ok sm:flex">
+                    <span className="led h-1.5 w-1.5 rounded-full bg-ok" />
+                    Sin costo
+                  </span>
+                </div>
+                <div className="p-6 sm:p-8">
+                  <ContactForm />
+                </div>
               </div>
             </Reveal>
-          </div>
+          </Module>
         </section>
       </main>
       <Footer />
+      </div>
     </>
   );
 }

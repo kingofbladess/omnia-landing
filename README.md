@@ -39,9 +39,20 @@ update public.profiles set role = 'admin' where email = 'tu-correo@ejemplo.com';
 
 1. Entra a [vercel.com](https://vercel.com) con tu cuenta de GitHub → **Add New → Project** → elige `omnia-landing`.
 2. En **Environment Variables** agrega `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` → **Deploy**.
-3. En el proyecto: **Settings → Domains → Add** y agrega `omnia.ia.ve` y `www.omnia.ia.ve` (que `www` redirija al dominio principal).
-4. En el dominio, abre la pestaña **Vercel DNS**: te mostrará los nameservers `ns1.vercel-dns.com` y `ns2.vercel-dns.com`. Entra en [nic.ve](https://nic.ve) con la cuenta titular del dominio y reemplaza los nameservers actuales por esos dos. Vercel gestiona entonces el DNS y el certificado SSL automáticamente. La propagación puede tardar de minutos a 48 horas.
-5. En Supabase → **Authentication → URL Configuration**: *Site URL* `https://omnia.ia.ve` y agrega `https://omnia.ia.ve/**` en *Redirect URLs*.
+Mientras no haya dominio propio, el sitio funciona en `https://omnia-landing-odp7.vercel.app`.
+
+### Conectar `omnia.ia.ve` (cuando el titular lo autorice)
+
+El dominio está registrado en NIC.VE por un tercero y su DNS está en una cuenta de Cloudflare de ese titular (`hassan` / `evelyn.ns.cloudflare.com`).
+
+1. En Vercel → proyecto → **Settings → Domains → Add Existing** → `omnia.ia.ve`. Vercel mostrará los registros DNS exactos que necesita.
+2. El titular crea esos registros en **su** Cloudflare (**DNS → Records**), con el proxy en **DNS only** (nube gris). Normalmente:
+   - `CNAME` · `@` · el valor `…vercel-dns-017.com` que muestre Vercel (o `A` · `@` · `76.76.21.21`)
+   - `TXT` · `_vercel` · el valor `vc-domain-verify=…`, solo si Vercel lo pide
+3. Cuando Vercel marque el dominio como **Valid Configuration**, en **Settings → Environment Variables** agrega `NEXT_PUBLIC_SITE_DOMAIN` = `omnia.ia.ve` y haz **Redeploy**. Con eso los metadatos, el sitemap, el robots y las páginas legales pasan a usar el dominio.
+4. En Supabase → **Authentication → URL Configuration**: *Site URL* `https://omnia.ia.ve` y agrega `https://omnia.ia.ve/**` en *Redirect URLs*.
+
+Alternativa: si el titular prefiere no usar Cloudflare, puede cambiar los nameservers en [nic.ve](https://nic.ve) a `ns1.vercel-dns.com` y `ns2.vercel-dns.com`, y Vercel gestiona todo el DNS.
 
 ## Estructura
 

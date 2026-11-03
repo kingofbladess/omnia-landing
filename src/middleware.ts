@@ -27,11 +27,19 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  if (!user && PROTECTED.some((p) => path === p || path.startsWith(`${p}/`))) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/acceso";
-    url.search = `?next=${encodeURIComponent(path)}`;
-    return NextResponse.redirect(url);
+  if (PROTECTED.some((p) => path === p || path.startsWith(`${p}/`))) {
+    // Sin sesión, o con verificación en dos pasos pendiente → a /acceso
+    let blocked = !user;
+    if (user) {
+      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      blocked = aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2";
+    }
+    if (blocked) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/acceso";
+      url.search = `?next=${encodeURIComponent(path)}`;
+      return NextResponse.redirect(url);
+    }
   }
 
   return response;

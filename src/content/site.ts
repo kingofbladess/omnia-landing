@@ -10,9 +10,16 @@ export const site = {
   name: "OMNIA",
   legalName: "OMNIA Tecnología e Infraestructura, C.A.",
   rif: "J-50886695-9",
-  domain: "omnia-landing-odp7.vercel.app",
+  /**
+   * Dominio público del sitio (sin https://). Se usa en metadatos, sitemap, robots y páginas legales.
+   * Se configura con NEXT_PUBLIC_SITE_DOMAIN en Vercel; mientras no exista el dominio propio,
+   * se usa la dirección de Vercel.
+   */
+  domain: process.env.NEXT_PUBLIC_SITE_DOMAIN || "omnia-landing-odp7.vercel.app",
   email: "contacto@omnia.ia.ve",
   phone: "+58 000 000 0000",
+  /** Número de WhatsApp con código de país, solo dígitos (ej. "584141234567"). Vacío = no se muestra el botón. */
+  whatsapp: "",
   city: "Maracaibo, Zulia, Venezuela",
   address:
     "Calle 67 con Avenida 3F, C.C. Camoruco, nivel PB, local 1-03, sector Bellas Artes, Maracaibo, estado Zulia, zona postal 4002",
@@ -38,6 +45,7 @@ export const hero = {
 
 export const capabilities = [
   "Centros de datos",
+  "Servidores",
   "Cloud híbrida",
   "Software a medida",
   "IA aplicada",
@@ -50,28 +58,30 @@ export const capabilities = [
 export const solutions = [
   {
     id: "dc",
-    code: "01",
     title: "Data Center",
     text: "Diseño, implementación y operación de centros de datos con alta disponibilidad, energía redundante y monitoreo continuo.",
     points: ["Colocation y racks dedicados", "Energía y climatización redundante", "Monitoreo NOC 24/7"],
   },
   {
+    id: "srv",
+    title: "Servidores",
+    text: "Suministro, instalación y administración de servidores físicos y virtuales, dimensionados para la carga real de tu operación.",
+    points: ["Servidores rack, torre y blade", "Virtualización y clústeres", "Mantenimiento y soporte de hardware"],
+  },
+  {
     id: "sw",
-    code: "02",
     title: "Software a medida",
     text: "Plataformas web, móviles y sistemas empresariales construidos para tu operación, integrados con lo que ya usas.",
     points: ["ERP, CRM e integraciones", "Apps web y móviles", "APIs y microservicios"],
   },
   {
     id: "ai",
-    code: "03",
     title: "IA aplicada",
     text: "Modelos y asistentes que automatizan procesos, analizan datos y convierten información en decisiones.",
     points: ["Asistentes y agentes", "Análisis predictivo", "Visión y documentos"],
   },
   {
     id: "sec",
-    code: "04",
     title: "Cloud y seguridad",
     text: "Arquitecturas híbridas seguras, respaldos y continuidad de negocio para que tu operación nunca se detenga.",
     points: ["Cloud híbrida y migraciones", "Backups y recuperación", "Hardening y auditorías"],
@@ -82,7 +92,7 @@ export const solutions = [
 export const stats = [
   { value: 24, suffix: "/7", label: "Monitoreo de infraestructura" },
   { value: 99.9, suffix: "%", decimals: 1, label: "Objetivo de disponibilidad" },
-  { value: 4, suffix: "", label: "Líneas de servicio integradas" },
+  { value: 5, suffix: "", label: "Líneas de servicio integradas" },
   { value: 1, suffix: "", label: "Solo proveedor, de punta a punta" },
 ];
 

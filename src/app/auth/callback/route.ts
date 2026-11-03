@@ -1,12 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { safeRedirect } from "@/lib/safe-redirect";
 import { createClient } from "@/lib/supabase/server";
 
 /** Recibe el enlace de confirmación / recuperación enviado por correo. */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const nextParam = searchParams.get("next") ?? "/cuenta";
-  const next = nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/cuenta";
+  const next = safeRedirect(searchParams.get("next"));
 
   if (code) {
     const supabase = await createClient();

@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { safeRedirect } from "@/lib/safe-redirect";
 import { createClient } from "@/lib/supabase/client";
 import { MagneticButton } from "./interactive";
 
-type Mode = "login" | "signup" | "reset";
+type Mode = "login" | "signup" | "reset" | "mfa";
 
 const input =
   "w-full rounded-xl border border-line bg-white/[0.03] px-4 py-3 text-sm text-fg outline-none transition-colors placeholder:text-muted/70 focus:border-accent focus:bg-white/[0.05]";
@@ -18,17 +19,17 @@ function translate(msg: string) {
   if (m.includes("already registered")) return "Ese correo ya tiene una cuenta. Inicia sesión.";
   if (m.includes("password should be")) return "La contraseña debe tener al menos 8 caracteres.";
   if (m.includes("rate limit")) return "Demasiados intentos. Espera unos minutos.";
+  if (m.includes("mfa code format")) return "El código tiene 6 dígitos.";
+  if (m.includes("mfa")) return "Código incorrecto o vencido. Prueba con el que muestra ahora tu app.";
   return "Algo salió mal. Inténtalo de nuevo.";
 }
 
-/** Valida que la URL de retorno sea una ruta interna (evita redirecciones abiertas). */
-function safeNext(next: string | undefined) {
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/cuenta";
-}
+const browserClient = () => createClient();
 
-export function AuthForm({ next }: { next?: string }) {
+/** `mfa`: la sesión ya existe pero falta el código de verificación en dos pasos. */
+export function AuthForm({ next, mfa = false }: { next?: string; mfa?: boolean }) {
   const router = useRouter();
-  const [mode, setMode] = useState<Mode>("login");
+  const [mode, setMode] = useState<Mode>(mfa ? "mfa" : "login");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -42,10 +43,26 @@ export function AuthForm({ next }: { next?: string }) {
     setMsg(null);
     const supabase = createClient();
     try {
-      if (mode === "login") {
+      if (mode === "mfa") {
+        const code = String(fd.get("code") ?? "").replace(/\s/g, "");
+        if (!/^\d{6}$/.test(code)) throw new Error("mfa code format");
+        const { data } = await supabase.auth.mfa.listFactors();
+        const factor = data?.totp?.[0];
+        if (!factor) throw new Error("mfa no factor");
+        const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code });
+        if (error) throw new Error("mfa invalid");
+        router.replace(safeRedirect(next));
+        router.refresh();
+      } else if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        router.replace(safeNext(next));
+        // ¿La cuenta tiene verificación en dos pasos? Entonces falta el código.
+        const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        if (aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
+          setMode("mfa");
+          return;
+        }
+        router.replace(safeRedirect(next));
         router.refresh();
       } else if (mode === "signup") {
         if (password.length < 8) throw new Error("password should be at least 8");
@@ -86,7 +103,7 @@ export function AuthForm({ next }: { next?: string }) {
 
   return (
     <div>
-      {mode !== "reset" && (
+      {mode !== "reset" && mode !== "mfa" && (
         <div role="tablist" className="relative mb-8 grid grid-cols-2 rounded-full border border-line bg-white/[0.02] p-1">
           <span
             aria-hidden
@@ -112,6 +129,15 @@ export function AuthForm({ next }: { next?: string }) {
       )}
 
       <form onSubmit={onSubmit} className="space-y-4">
+        {mode === "mfa" && (
+          <div>
+            <p className="mb-4 text-sm text-muted">Tu cuenta tiene verificación en dos pasos. Escribe el código de 6 dígitos que muestra tu app de autenticación.</p>
+            <label htmlFor="code" className="mb-1.5 block text-xs text-muted">
+              Código de verificación
+            </label>
+            <input id="code" name="code" inputMode="numeric" autoComplete="one-time-code" maxLength={7} required autoFocus className={`${input} text-center text-lg tracking-[0.4em]`} />
+          </div>
+        )}
         {mode === "signup" && (
           <div>
             <label htmlFor="full_name" className="mb-1.5 block text-xs text-muted">
@@ -120,13 +146,15 @@ export function AuthForm({ next }: { next?: string }) {
             <input id="full_name" name="full_name" autoComplete="name" required className={input} />
           </div>
         )}
-        <div>
-          <label htmlFor="email" className="mb-1.5 block text-xs text-muted">
-            Correo
-          </label>
-          <input id="email" name="email" type="email" autoComplete="email" required className={input} />
-        </div>
-        {mode !== "reset" && (
+        {mode !== "mfa" && (
+          <div>
+            <label htmlFor="email" className="mb-1.5 block text-xs text-muted">
+              Correo
+            </label>
+            <input id="email" name="email" type="email" autoComplete="email" required className={input} />
+          </div>
+        )}
+        {mode !== "reset" && mode !== "mfa" && (
           <div>
             <div className="mb-1.5 flex items-center justify-between">
               <label htmlFor="password" className="block text-xs text-muted">
@@ -167,7 +195,7 @@ export function AuthForm({ next }: { next?: string }) {
         )}
 
         <MagneticButton type="submit" disabled={loading} className="w-full">
-          {loading ? "Un momento…" : mode === "login" ? "Entrar" : mode === "signup" ? "Crear cuenta" : "Enviar enlace"}
+          {loading ? "Un momento…" : mode === "login" ? "Entrar" : mode === "signup" ? "Crear cuenta" : mode === "mfa" ? "Verificar" : "Enviar enlace"}
         </MagneticButton>
 
         {msg && (
@@ -178,6 +206,19 @@ export function AuthForm({ next }: { next?: string }) {
         {mode === "reset" && (
           <button type="button" onClick={() => setMode("login")} className="text-sm text-muted hover:text-fg">
             ← Volver a iniciar sesión
+          </button>
+        )}
+        {mode === "mfa" && (
+          <button
+            type="button"
+            onClick={async () => {
+              await browserClient().auth.signOut();
+              setMode("login");
+              setMsg(null);
+            }}
+            className="text-sm text-muted hover:text-fg"
+          >
+            ← Entrar con otra cuenta
           </button>
         )}
       </form>

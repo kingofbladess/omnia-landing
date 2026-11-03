@@ -1,13 +1,16 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { requireAdmin } from "@/lib/supabase/guards";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
 
 export type FormState = { ok: boolean; message: string } | null;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function field(form: FormData, name: string) {
   return String(form.get(name) ?? "").trim();
@@ -48,6 +51,9 @@ export async function submitLead(_prev: FormState, form: FormData): Promise<Form
     user_id: user?.id ?? null,
   });
 
+  if (error?.message?.startsWith("rate_limit")) {
+    return { ok: false, message: "Ya recibimos varias solicitudes tuyas hace poco. Te responderemos pronto; si es urgente, escríbenos por correo." };
+  }
   if (error) {
     console.error("submitLead", error);
     return { ok: false, message: "No pudimos enviar tu mensaje. Inténtalo de nuevo en unos minutos." };
@@ -55,24 +61,20 @@ export async function submitLead(_prev: FormState, form: FormData): Promise<Form
   return { ok: true, message: "¡Gracias! Recibimos tu solicitud y te contactaremos pronto." };
 }
 
-async function requireAdmin() {
-  const { supabase, user, profile } = await getCurrentUser();
-  if (!user || profile?.role !== "admin") throw new Error("No autorizado");
-  return { supabase, user };
-}
-
 export async function updateLeadStatus(form: FormData) {
   const { supabase } = await requireAdmin();
   const id = field(form, "id");
   const status = field(form, "status");
-  if (!["nuevo", "contactado", "cerrado"].includes(status)) return;
+  if (!UUID_RE.test(id) || !["nuevo", "contactado", "cerrado"].includes(status)) return;
   await supabase.from("leads").update({ status }).eq("id", id);
-  revalidatePath("/admin");
+  revalidatePath("/admin", "layout");
 }
 
 export async function deleteLead(form: FormData) {
   const { supabase } = await requireAdmin();
-  await supabase.from("leads").delete().eq("id", field(form, "id"));
+  const id = field(form, "id");
+  if (!UUID_RE.test(id)) return;
+  await supabase.from("leads").delete().eq("id", id);
   revalidatePath("/admin");
 }
 
@@ -80,7 +82,7 @@ export async function setUserRole(form: FormData) {
   const { supabase, user } = await requireAdmin();
   const id = field(form, "id");
   const role = field(form, "role");
-  if (!["user", "admin"].includes(role)) return;
+  if (!UUID_RE.test(id) || !["user", "admin"].includes(role)) return;
   // Evita que un admin se quite el rol a sí mismo por accidente y se quede fuera.
   if (id === user?.id && role !== "admin") return;
   await supabase.from("profiles").update({ role }).eq("id", id);
@@ -90,8 +92,19 @@ export async function setUserRole(form: FormData) {
 export async function updateProfile(_prev: FormState, form: FormData): Promise<FormState> {
   const { supabase, user } = await getCurrentUser();
   if (!user) return { ok: false, message: "Tu sesión expiró." };
-  const fullName = field(form, "full_name").slice(0, 120);
-  const { error } = await supabase.from("profiles").update({ full_name: fullName || null }).eq("id", user.id);
+  const opt = (name: string, max: number) => field(form, name).slice(0, max) || null;
+  const rif = opt("rif", 20)?.toUpperCase() ?? null;
+  if (rif && !/^[VEJPG]-?\d{6,9}-?\d?$/.test(rif)) return { ok: false, message: "El RIF no parece válido (ej. J-50886695-9)." };
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      full_name: opt("full_name", 120),
+      company: opt("company", 160),
+      rif,
+      phone: opt("phone", 40),
+      job_title: opt("job_title", 120),
+    })
+    .eq("id", user.id);
   if (error) return { ok: false, message: "No se pudo guardar." };
   revalidatePath("/cuenta");
   return { ok: true, message: "Perfil actualizado." };
@@ -100,7 +113,15 @@ export async function updateProfile(_prev: FormState, form: FormData): Promise<F
 export async function signOut() {
   if (isSupabaseConfigured) {
     const supabase = await createClient();
-    await supabase.auth.signOut();
+    // Si Supabase no puede cerrar la sesión en el servidor (token caducado, sin red…),
+    // igual la cerramos en este navegador.
+    const { error } = await supabase.auth.signOut();
+    if (error) await supabase.auth.signOut({ scope: "local" });
+    // Por si quedara alguna cookie de sesión, se borra a mano.
+    const store = await cookies();
+    for (const c of store.getAll()) if (c.name.startsWith("sb-")) store.delete(c.name);
   }
-  redirect("/");
+  // Que ninguna página guardada siga mostrando "Mi cuenta".
+  revalidatePath("/", "layout");
+  redirect("/?sesion=cerrada");
 }

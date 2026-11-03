@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { deleteLead, setUserRole, updateLeadStatus } from "@/app/actions";
+import { updateMeetingStatus } from "@/app/admin/actions";
+import { Badge } from "@/components/portal";
+import { MEETING_STATUS, fmtDateTime } from "@/lib/portal";
 import { AppShell, NotConfigured } from "@/components/AppShell";
 import { AutoSubmitSelect, ConfirmButton } from "@/components/AutoSubmitSelect";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -32,46 +35,88 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   let leadsQuery = supabase.from("leads").select("*").order("created_at", { ascending: false }).limit(200);
   if (filter) leadsQuery = leadsQuery.eq("status", filter);
 
-  const [{ data: leads }, { data: users }, { count: total }, { count: nuevos }] = await Promise.all([
+  const [{ data: leads }, { data: users }, { count: total }, { count: nuevos }, { data: meetings }] = await Promise.all([
     leadsQuery,
     supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(500),
     supabase.from("leads").select("id", { count: "exact", head: true }),
     supabase.from("leads").select("id", { count: "exact", head: true }).eq("status", "nuevo"),
+    supabase.from("meetings").select("id, topic, starts_at, status, user_id").order("starts_at", { ascending: false }).limit(200),
   ]);
+  const pendingMeetings = (meetings ?? []).filter((m) => m.status === "solicitada").length;
+  const userName = (id: string) => {
+    const u = (users ?? []).find((x: Profile) => x.id === id) as Profile | undefined;
+    return u?.full_name || u?.email || "Cliente";
+  };
 
-  const admins = (users ?? []).filter((u: Profile) => u.role === "admin").length;
   const kpis = [
     { k: "Solicitudes", v: total ?? 0 },
     { k: "Sin atender", v: nuevos ?? 0 },
+    { k: "Reuniones por confirmar", v: pendingMeetings },
     { k: "Usuarios", v: users?.length ?? 0 },
-    { k: "Administradores", v: admins },
   ];
 
   const tabCls = (on: boolean) => `rounded-full px-4 py-1.5 text-sm transition-colors ${on ? "bg-accent text-white" : "text-muted hover:text-fg"}`;
 
   return (
-    <AppShell isAdmin email={user.email}>
-      <h1 className="font-display text-3xl font-semibold text-fg sm:text-4xl">Panel de administración</h1>
+    <AppShell isAdmin active="admin">
+      <h1 className="pt-6 font-display text-3xl font-semibold text-fg sm:text-4xl">Panel de administración</h1>
 
       <dl className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4">
         {kpis.map((k) => (
-          <div key={k.k} className="rounded-2xl border border-line bg-panel/60 p-5">
+          <div key={k.k} className="glass rounded-2xl p-5">
             <dt className="text-xs uppercase tracking-[0.14em] text-muted">{k.k}</dt>
             <dd className="mt-2 font-display text-3xl font-semibold text-fg tabular-nums">{k.v}</dd>
           </div>
         ))}
       </dl>
 
-      <div className="mt-10 inline-flex rounded-full border border-line bg-white/[0.02] p-1">
-        <Link href="/admin?tab=leads" className={tabCls(tab !== "usuarios")}>
+      <div className="glass-pill mt-10 inline-flex rounded-full p-1">
+        <Link href="/admin?tab=leads" className={tabCls(tab !== "usuarios" && tab !== "reuniones")}>
           Solicitudes
+        </Link>
+        <Link href="/admin?tab=reuniones" className={tabCls(tab === "reuniones")}>
+          Reuniones{pendingMeetings ? ` (${pendingMeetings})` : ""}
         </Link>
         <Link href="/admin?tab=usuarios" className={tabCls(tab === "usuarios")}>
           Usuarios
         </Link>
       </div>
 
-      {tab !== "usuarios" ? (
+      {tab === "reuniones" ? (
+        <section className="glass mt-6 rounded-[1.75rem] p-6">
+          {meetings && meetings.length > 0 ? (
+            <ul className="space-y-2">
+              {meetings.map((m) => (
+                <li key={m.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--glass-border)] bg-white/[0.03] px-4 py-3">
+                  <span className="min-w-0">
+                    <span className="block text-sm text-fg">{m.topic}</span>
+                    <span className="block text-xs text-muted">
+                      {fmtDateTime(m.starts_at)} ·{" "}
+                      <Link href={`/admin/usuarios/${m.user_id}`} className="text-accent-2 hover:underline">
+                        {userName(m.user_id)}
+                      </Link>
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <Badge className={MEETING_STATUS[m.status]?.cls}>{MEETING_STATUS[m.status]?.label}</Badge>
+                    <form action={updateMeetingStatus}>
+                      <input type="hidden" name="id" value={m.id} />
+                      <AutoSubmitSelect
+                        name="status"
+                        defaultValue={m.status}
+                        label={`Estado de ${m.topic}`}
+                        options={Object.entries(MEETING_STATUS).map(([value, s]) => ({ value, label: s.label }))}
+                      />
+                    </form>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted">No hay reuniones solicitadas.</p>
+          )}
+        </section>
+      ) : tab !== "usuarios" ? (
         <section className="mt-6">
           <div className="mb-4 flex flex-wrap gap-2 text-xs">
             <Link href="/admin" className={`rounded-full border px-3 py-1 ${!filter ? "border-accent text-fg" : "border-line text-muted"}`}>
@@ -90,7 +135,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
           {leads && leads.length > 0 ? (
             <ul className="space-y-3">
               {(leads as Lead[]).map((l) => (
-                <li key={l.id} className="rounded-2xl border border-line bg-panel/60 p-5">
+                <li key={l.id} className="glass rounded-2xl p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <p className="font-medium text-fg">
@@ -117,16 +162,19 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                       </form>
                     </div>
                   </div>
-                  <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-fg/90">{l.message}</p>
+                  <p className="mt-3 line-clamp-4 whitespace-pre-wrap text-sm leading-relaxed text-fg/90">{l.message}</p>
+                  <Link href={`/admin/solicitudes/${l.id}`} className="mt-3 inline-block text-sm text-accent-2 hover:underline">
+                    Abrir conversación →
+                  </Link>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="rounded-2xl border border-line p-6 text-sm text-muted">No hay solicitudes{filter ? " con ese estado" : ""}.</p>
+            <p className="glass rounded-2xl p-6 text-sm text-muted">No hay solicitudes{filter ? " con ese estado" : ""}.</p>
           )}
         </section>
       ) : (
-        <section className="mt-6 overflow-x-auto rounded-2xl border border-line">
+        <section className="glass mt-6 overflow-x-auto rounded-2xl">
           <table className="w-full min-w-[560px] text-left text-sm">
             <thead className="border-b border-line bg-white/[0.02] text-xs uppercase tracking-[0.12em] text-muted">
               <tr>
@@ -139,7 +187,9 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
               {((users ?? []) as Profile[]).map((u) => (
                 <tr key={u.id}>
                   <td className="px-4 py-3">
-                    <span className="block text-fg">{u.full_name || "—"}</span>
+                    <Link href={`/admin/usuarios/${u.id}`} className="block text-fg hover:text-accent-2">
+                      {u.full_name || "—"} <span className="text-xs text-accent-2">→ ficha</span>
+                    </Link>
                     <span className="block text-xs text-muted">{u.email}</span>
                   </td>
                   <td className="px-4 py-3 text-muted">{new Date(u.created_at).toLocaleDateString("es-VE")}</td>
