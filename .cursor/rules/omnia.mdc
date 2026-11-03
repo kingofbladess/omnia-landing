@@ -5,7 +5,7 @@ alwaysApply: true
 
 # OMNIA · Landing
 
-- Sitio de OMNIA Tecnología e Infraestructura, C.A. (RIF J-50886695-9, Maracaibo, Zulia). Dominio previsto: omnia.ia.ve.
+- Sitio de OMNIA Tecnología e Infraestructura, C.A. (RIF J-50886695-9, Maracaibo, Zulia). Publicado en https://omnia-landing-odp7.vercel.app (sin dominio propio por ahora).
 - Stack: Next.js 15 (App Router, `src/`), React 19, Tailwind CSS 4, Supabase (`@supabase/ssr`), despliegue en Vercel.
 - Idioma de la interfaz y del código visible: español.
 - Textos editables en `src/content/site.ts`; colores/tokens en `src/app/globals.css` (`--accent`, `--bg`, etc.). No uses colores sueltos: usa los tokens (`bg-accent`, `text-muted`, `border-line`...).

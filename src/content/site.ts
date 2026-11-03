@@ -10,7 +10,7 @@ export const site = {
   name: "OMNIA",
   legalName: "OMNIA Tecnología e Infraestructura, C.A.",
   rif: "J-50886695-9",
-  domain: "omnia.ia.ve",
+  domain: "omnia-landing-odp7.vercel.app",
   email: "contacto@omnia.ia.ve",
   phone: "+58 000 000 0000",
   city: "Maracaibo, Zulia, Venezuela",
@@ -33,6 +33,7 @@ export const hero = {
     "Diseñamos, construimos y operamos la tecnología crítica de tu empresa: desde el rack hasta la última línea de código.",
   primary: { label: "Agenda una consultoría", href: "#contacto" },
   secondary: { label: "Explora soluciones", href: "#soluciones" },
+  proof: ["Soporte 24/7", "Diagnóstico sin costo", "Desde Maracaibo"],
 };
 
 export const capabilities = [

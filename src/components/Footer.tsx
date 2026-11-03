@@ -58,7 +58,7 @@ export function Footer() {
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-xs text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <span>
-            © {year} {site.legalName}. RIF {site.rif}. Todos los derechos reservados.
+            © {year} {site.legalName.replace(/\.$/, "")}. RIF {site.rif}. Todos los derechos reservados.
           </span>
           <span className="font-mono">{site.domain}</span>
         </div>

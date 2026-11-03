@@ -42,36 +42,53 @@ export default function Home() {
             <HeroCanvas />
           </div>
 
-          <div className="mx-auto grid w-full max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1.4fr_1fr] lg:px-8">
-            <div>
-              <Reveal>
-                <span className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-muted backdrop-blur sm:text-[11px] sm:tracking-[0.16em]">
-                  <span className="led h-1.5 w-1.5 rounded-full bg-accent-2" />
-                  {hero.eyebrow}
-                </span>
-              </Reveal>
-              <Reveal delay={100}>
-                <h1 className="mt-6 font-display text-[2.6rem] font-semibold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
-                  <span className="block text-fg">{hero.title[0]}</span>
-                  <span className="text-gradient block">{hero.title[1]}</span>
-                </h1>
-              </Reveal>
-              <Reveal delay={200}>
-                <p className="mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg">{hero.subtitle}</p>
-              </Reveal>
-              <Reveal delay={300}>
-                <div className="mt-9 flex flex-wrap gap-3">
-                  <MagneticButton href={hero.primary.href}>{hero.primary.label}</MagneticButton>
-                  <MagneticButton href={hero.secondary.href} variant="ghost">
-                    {hero.secondary.label}
-                  </MagneticButton>
-                </div>
+          <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+            <Reveal>
+              <span className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-muted backdrop-blur sm:text-[11px] sm:tracking-[0.16em]">
+                <span className="led h-1.5 w-1.5 shrink-0 rounded-full bg-accent-2" />
+                {hero.eyebrow}
+              </span>
+            </Reveal>
+            <Reveal delay={100}>
+              <h1 className="mt-6 font-display text-[2.6rem] font-semibold leading-[1.02] tracking-[-0.03em] text-balance sm:text-6xl lg:text-[clamp(3.5rem,5.6vw,4.9rem)]">
+                <span className="block text-fg lg:whitespace-nowrap">{hero.title[0]}</span>
+                <span className="text-gradient block pb-[0.08em] lg:whitespace-nowrap">{hero.title[1]}</span>
+              </h1>
+            </Reveal>
+
+            <div className="mt-8 grid items-start gap-12 lg:grid-cols-[1fr_auto]">
+              <div>
+                <Reveal delay={200}>
+                  <p className="max-w-xl text-base leading-relaxed text-muted sm:text-lg">{hero.subtitle}</p>
+                </Reveal>
+                <Reveal delay={300}>
+                  <div className="mt-9 flex flex-wrap gap-3">
+                    <MagneticButton href={hero.primary.href}>{hero.primary.label}</MagneticButton>
+                    <MagneticButton href={hero.secondary.href} variant="ghost">
+                      {hero.secondary.label}
+                    </MagneticButton>
+                  </div>
+                </Reveal>
+                <Reveal delay={350}>
+                  <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+                    {hero.proof.map((p) => (
+                      <li key={p} className="flex items-center gap-2">
+                        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-accent-2" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                          <path d="M3 8.5l3 3 7-7" />
+                        </svg>
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                </Reveal>
+              </div>
+              <Reveal delay={400} className="hidden lg:-mt-14 lg:block xl:-mt-20">
+                <LiveStatus />
               </Reveal>
             </div>
-            <Reveal delay={400} className="hidden justify-self-end lg:block">
-              <LiveStatus />
-            </Reveal>
           </div>
+
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-b from-transparent to-bg" />
 
           <a
             href="#soluciones"
@@ -110,18 +127,24 @@ export default function Home() {
             <div className="mt-14 grid gap-4 md:grid-cols-2">
               {solutions.map((s, i) => (
                 <Reveal key={s.id} delay={i * 80}>
-                  <SpotCard className="group h-full p-7 sm:p-8">
-                    <div className="flex items-start justify-between">
+                  <SpotCard className="group relative h-full overflow-hidden p-7 sm:p-8">
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute -right-3 -top-6 select-none font-display text-[8rem] font-semibold leading-none text-white/[0.025] transition-colors duration-500 group-hover:text-accent/[0.07]"
+                    >
+                      {s.code}
+                    </span>
+                    <div aria-hidden className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-line-strong to-transparent" />
+                    <div className="relative flex items-start justify-between">
                       <span className="flex h-12 w-12 items-center justify-center rounded-xl border border-line-strong bg-accent/10 text-accent-2 transition-colors duration-300 group-hover:bg-accent group-hover:text-white">
                         <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                           {icons[s.id]}
                         </svg>
                       </span>
-                      <span className="font-mono text-xs text-muted">{s.code}</span>
                     </div>
-                    <h3 className="mt-6 font-display text-2xl font-semibold text-fg">{s.title}</h3>
-                    <p className="mt-3 leading-relaxed text-muted">{s.text}</p>
-                    <ul className="mt-6 space-y-2 border-t border-line pt-5">
+                    <h3 className="relative mt-6 font-display text-2xl font-semibold text-fg">{s.title}</h3>
+                    <p className="relative mt-3 leading-relaxed text-muted">{s.text}</p>
+                    <ul className="relative mt-6 space-y-2 border-t border-line pt-5">
                       {s.points.map((p) => (
                         <li key={p} className="flex items-center gap-3 text-sm text-fg/90">
                           <span className="h-px w-4 bg-accent-2 transition-all duration-300 group-hover:w-6" />
@@ -152,16 +175,22 @@ export default function Home() {
         </section>
 
         {/* ---------- CIFRAS ---------- */}
-        <section aria-label="Cifras" className="py-20">
-          <div className="mx-auto grid max-w-7xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line px-0 md:grid-cols-4 lg:mx-8 xl:mx-auto">
-            {stats.map((s) => (
-              <div key={s.label} className="bg-bg p-6 sm:p-8">
-                <div className="font-display text-4xl font-semibold text-fg sm:text-5xl">
-                  <Counter value={s.value} decimals={s.decimals} suffix={s.suffix} />
+        <section aria-label="Cifras" className="py-20 sm:py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-4">
+              {stats.map((s) => (
+                <div key={s.label} className="group relative bg-bg p-6 transition-colors duration-300 hover:bg-panel sm:p-8">
+                  <span
+                    aria-hidden
+                    className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-gradient-to-r from-accent to-accent-2 transition-transform duration-500 group-hover:scale-x-100"
+                  />
+                  <div className="font-display text-4xl font-semibold tracking-tight text-fg tabular-nums sm:text-5xl">
+                    <Counter value={s.value} decimals={s.decimals} suffix={s.suffix} />
+                  </div>
+                  <div className="mt-2 text-sm text-muted">{s.label}</div>
                 </div>
-                <div className="mt-2 text-sm text-muted">{s.label}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
