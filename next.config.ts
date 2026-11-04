@@ -11,13 +11,15 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // El sitio no usa cámara, micrófono ni ubicación.
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
-  // Siempre HTTPS (Vercel ya sirve con HTTPS; esto lo fija en el navegador).
+  // Siempre HTTPS (Traefik/Dokploy ya sirve con HTTPS; esto lo fija en el navegador).
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
 ];
 
 const nextConfig: NextConfig = {
   // Permite compilar en otra carpeta (p. ej. para verificar sin tocar el servidor de desarrollo).
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  // Salida autocontenida para la imagen Docker (Dokploy).
+  output: "standalone",
   // No anunciar "X-Powered-By: Next.js".
   poweredByHeader: false,
   async headers() {
